@@ -151,6 +151,7 @@
         <label>📖 分野を選択（複数選択可）</label>
         <div class="major-row">
           <button class="all-btn" onclick="selectAll()">すべて選択</button>
+          <button class="all-btn" style="border-color:var(--gray);color:var(--gray)" onclick="clearAll()">すべてクリア</button>
           <button class="major-btn" onclick="filterMajor('実地',this)">実地</button>
           <button class="major-btn" onclick="filterMajor('基礎3',this)">基礎3</button>
           <button class="major-btn" onclick="filterMajor('一般',this)">一般</button>
@@ -162,11 +163,13 @@
       <div class="form-group">
         <label>🔢 問題数</label>
         <div class="count-row">
+          <button class="count-btn" onclick="setCount(5,this)">5問</button>
           <button class="count-btn selected" onclick="setCount(10,this)">10問</button>
           <button class="count-btn" onclick="setCount(20,this)">20問</button>
           <button class="count-btn" onclick="setCount(30,this)">30問</button>
+          <button class="count-btn" onclick="setCount(40,this)">40問</button>
           <button class="count-btn" onclick="setCount(50,this)">50問</button>
-          <input class="count-custom" type="number" id="customCount" min="1" max="200" placeholder="任意" oninput="setCustomCount(this)">
+          <input class="count-custom" type="number" id="customCount" min="1" max="968" placeholder="任意" oninput="setCustomCount(this)">
         </div>
       </div>
 
@@ -303,12 +306,12 @@ function initSetup() {
 
   allCats.forEach(cat => {
     const btn = document.createElement('button');
-    btn.className = 'cat-btn selected';
+    btn.className = 'cat-btn';
     btn.textContent = cat;
     btn.dataset.cat = cat;
     btn.onclick = () => toggleCat(cat, btn);
     grid.appendChild(btn);
-    selectedCats.add(cat);
+    // デフォルトは未選択
   });
 }
 
@@ -322,6 +325,12 @@ function toggleCat(cat, btn) {
 function selectAll() {
   selectedCats.clear();
   document.querySelectorAll('.cat-btn').forEach(btn => { selectedCats.add(btn.dataset.cat); btn.classList.add('selected'); });
+  document.querySelectorAll('.major-btn').forEach(b => b.classList.remove('active'));
+}
+
+function clearAll() {
+  selectedCats.clear();
+  document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
   document.querySelectorAll('.major-btn').forEach(b => b.classList.remove('active'));
 }
 
