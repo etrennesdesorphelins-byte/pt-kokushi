@@ -85,6 +85,7 @@
 
   .explanation { background: #FFF9E6; border-left: 4px solid var(--accent); border-radius: 0 9px 9px 0; padding: 12px 14px; margin-top: 14px; font-size: 0.88rem; line-height: 1.7; }
   .explanation strong { color: var(--accent); display: block; margin-bottom: 5px; }
+  #explText { white-space: pre-wrap; }
 
   .nav-btns { display: flex; gap: 10px; margin-top: 14px; }
   .nav-btn { flex: 1; padding: 12px; border: none; border-radius: 11px; font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
@@ -264,7 +265,7 @@ let answered = false;
 // ===== データ読み込み（localStorageキャッシュ付き）=====
 const CACHE_KEY = 'pt_kokushi_questions';
 const CACHE_VER_KEY = 'pt_kokushi_ver';
-const CACHE_VERSION = '3';
+const CACHE_VERSION = '4';
 
 async function loadData() {
   try {
