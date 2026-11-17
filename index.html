@@ -18,6 +18,9 @@
   .icon-circle { width: 42px; height: 42px; background: var(--mint); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
   header h1 { font-size: 1.15rem; font-weight: 700; }
   header p { font-size: 0.78rem; opacity: 0.8; }
+  header .data-info { margin-top: 2px; opacity: 0.95; }
+  header .data-info:empty { display: none; }
+  header .data-info span { display: inline-block; white-space: nowrap; margin-right: 10px; }
 
   main { max-width: 820px; margin: 0 auto; padding: 20px 14px; }
 
@@ -133,6 +136,7 @@
   <div>
     <h1>PT国試ボット　Web問題演習</h1>
     <p>理学療法士国家試験　学習支援システム</p>
+    <p class="data-info" id="dataInfo"></p>
   </div>
 </header>
 
@@ -265,7 +269,21 @@ let answered = false;
 // ===== データ読み込み（localStorageキャッシュ付き）=====
 const CACHE_KEY = 'pt_kokushi_questions';
 const CACHE_VER_KEY = 'pt_kokushi_ver';
-const CACHE_VERSION = '5';
+const CACHE_VERSION = '6';
+const CACHE_UPDATED_KEY = 'pt_kokushi_updated';
+const EXAM_RANGE = '第55回〜第61回';
+let dataUpdatedAt = '';
+
+function showDataInfo() {
+  const el = document.getElementById('dataInfo');
+  el.innerHTML = '';
+  const add = t => { const s = document.createElement('span'); s.textContent = t; el.appendChild(s); };
+  add(`${EXAM_RANGE}　全${allQuestions.length}問`);
+  const d = new Date(dataUpdatedAt);
+  if (dataUpdatedAt && !isNaN(d)) {
+    add(`最終更新：${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`);
+  }
+}
 
 async function loadData() {
   try {
@@ -274,19 +292,23 @@ async function loadData() {
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached && cachedVer === CACHE_VERSION) {
       allQuestions = JSON.parse(cached);
-      if (allQuestions.length > 0) { initSetup(); return; }
+      dataUpdatedAt = localStorage.getItem(CACHE_UPDATED_KEY) || '';
+      if (allQuestions.length > 0) { showDataInfo(); initSetup(); return; }
     }
     // キャッシュなし → GASから取得
     const res = await fetch(GAS_URL);
     if (!res.ok) throw new Error('データの取得に失敗しました (HTTP ' + res.status + ')');
     const data = await res.json();
     allQuestions = data.questions || [];
+    dataUpdatedAt = data.updatedAt || '';
     if (allQuestions.length === 0) throw new Error('問題データが空です');
     // キャッシュ保存
     try {
       localStorage.setItem(CACHE_KEY, JSON.stringify(allQuestions));
       localStorage.setItem(CACHE_VER_KEY, CACHE_VERSION);
+      localStorage.setItem(CACHE_UPDATED_KEY, dataUpdatedAt);
     } catch(e) { /* ストレージ容量超過時は無視 */ }
+    showDataInfo();
     initSetup();
   } catch(err) {
     document.getElementById('loadingScreen').innerHTML =
